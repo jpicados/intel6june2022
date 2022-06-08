@@ -1,0 +1,46 @@
+name: Static HTML Deployment to Ubuntu Server
+
+on:
+  push:
+    branches: ["main"]
+
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+     - name: Simple Build Print Statement
+       run: echo "this is a build job"
+
+  test: 
+   runs-on: ubuntu-lastest
+   stes:
+    - name: Simple Test Print Statement
+      run: echo "This is a test job"
+
+  
+  deployment:
+   runs-on: ubuntu-latest
+
+   steps:
+
+    - name: Checkout the code
+      uses: actions/checkout@v3
+
+    - name: Present Working Directory
+      run: |
+        pwd
+        ls -la
+
+    - name: Copy the Index.html to Ubuntu Server
+      uses: marcodallasanta/ssh-scp-deploy@v1.2.0
+      with:
+       local: 'index.html'
+       remote: '~/index.html'
+       host: ${{secrets.HOST}}
+       user: ${{secrets.USER}}
+       key: ${{secrets.KEY}}
+       pre_upload: sudo rm -rf /var/www/html/index.html
+       post_upload: sudo mv ~/index /var/www/html/index.html
+       ssh_options: -o StricHostkeyChecking=no
